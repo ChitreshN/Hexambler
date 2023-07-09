@@ -1,4 +1,5 @@
 #include <ctype.h>
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -6,14 +7,14 @@
 #define bits 16
 
 struct jump{
-    const char* nothing;
-    const char* JGT;
-    const char* JEQ;
-    const char* JGE;
-    const char* JLT;
-    const char* JNE;
-    const char* JLE;
-    const char* JMP;
+    const char nothing[3];
+    const char JGT[3];
+    const char JEQ[3];
+    const char JGE[3];
+    const char JLT[3];
+    const char JNE[3];
+    const char JLE[3];
+    const char JMP[3];
 };
 
 struct jump const jmp = {
@@ -28,14 +29,14 @@ struct jump const jmp = {
 };
 
 struct dest{
-    const char* nothing;
-    const char* M;
-    const char* D;
-    const char* MD;
-    const char* A;
-    const char* AM;
-    const char* AD;
-    const char* AMD;
+    const char nothing[3];
+    const char M[3];
+    const char D[3];
+    const char MD[3];
+    const char A[3];
+    const char AM[3];
+    const char AD[3];
+    const char AMD[3];
 };
 
 struct dest const dest_adr= {
@@ -50,24 +51,24 @@ struct dest const dest_adr= {
 };
 
 struct comp{
-    const char* _0;
-    const char* _1;
-    const char* _neg_1;
-    const char* D;
-    const char* A;
-    const char* not_D;
-    const char* not_A;
-    const char* neg_D;
-    const char* neg_A;
-    const char* D_p_1;
-    const char* A_p_1;
-    const char* D_m_1;
-    const char* A_m_1;
-    const char* D_p_A;
-    const char* D_m_A;
-    const char* A_m_D;
-    const char* D_and_A;
-    const char* D_or_A;
+    const char _0[6];
+    const char _1[6];
+    const char _neg_1[6];
+    const char D[6];
+    const char A[6];
+    const char not_D[6];
+    const char not_A[6];
+    const char neg_D[6];
+    const char neg_A[6];
+    const char D_p_1[6];
+    const char A_p_1[6];
+    const char D_m_1[6];
+    const char A_m_1[6];
+    const char D_p_A[6];
+    const char D_m_A[6];
+    const char A_m_D[6];
+    const char D_and_A[6];
+    const char D_or_A[6];
 };
 
 struct comp const comp_code = {
@@ -116,7 +117,44 @@ char* process_line(char code[bits],int n, char line[n+1]){
     // if eq = 1 then the line is a computation
     // if eq = 0 then it's a jump statement
     // if eq = 2 then it's a @value type instruction
-    
+    char before[4] = "000";
+    char after[4] = "000";
+    int enc = 0;
+    switch (eq) {
+        case 1:
+            for (int i = 0;i < n;i++){
+                if (enc == 0 && line[i] != '=') before[i] = line[i];
+                else if(line[i] == '=') enc = i;
+                else if(enc != 0){
+                    if(line[i] != '\0'){
+                        after[i-enc] = line[i];
+                    }
+                    else break; 
+                }
+            }
+        case 0:
+            for (int i = 0;i < n;i++){
+                if (enc == 0 && line[i] != ';') before[i] = line[i];
+                else if(line[i] == ';') enc = i;
+                else if(enc != 0){
+                    if(line[i] != '\0'){
+                        after[i-enc] = line[i];
+                    }
+                    else break; 
+                }
+            }
+        case 2:
+            for (int i = 0;i < n;i++){
+                if (enc == 0 && line[i] != '@') before[i] = line[i];
+                else if(line[i] == '@') enc = i;
+                else if(enc != 0){
+                    if(line[i] != '\0'){
+                        after[i-enc] = line[i];
+                    }
+                    else break; 
+                }
+            }
+    }
     return code;
 }
 
@@ -131,7 +169,7 @@ int main(int argc, char* argv[argc+1]){
     //    fclose(progfile);
     //}
     char code[bits];
-    char* processed = process_line(code, 3, "==12");
+    char* processed = process_line(code, 5, "1=12");
     printf("%s",processed);
     return 0;
 }
