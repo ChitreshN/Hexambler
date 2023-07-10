@@ -7,14 +7,14 @@
 #define bits 16
 
 struct jump{
-    const char nothing[3];
-    const char JGT[3];
-    const char JEQ[3];
-    const char JGE[3];
-    const char JLT[3];
-    const char JNE[3];
-    const char JLE[3];
-    const char JMP[3];
+    const char nothing[4];
+    const char JGT[4];
+    const char JEQ[4];
+    const char JGE[4];
+    const char JLT[4];
+    const char JNE[4];
+    const char JLE[4];
+    const char JMP[4];
 };
 
 struct jump const jmp = {
@@ -29,14 +29,14 @@ struct jump const jmp = {
 };
 
 struct dest{
-    const char nothing[3];
-    const char M[3];
-    const char D[3];
-    const char MD[3];
-    const char A[3];
-    const char AM[3];
-    const char AD[3];
-    const char AMD[3];
+    const char nothing[4];
+    const char M[4];
+    const char D[4];
+    const char MD[4];
+    const char A[4];
+    const char AM[4];
+    const char AD[4];
+    const char AMD[4];
 };
 
 struct dest const dest_adr= {
@@ -51,24 +51,24 @@ struct dest const dest_adr= {
 };
 
 struct comp{
-    const char _0[6];
-    const char _1[6];
-    const char _neg_1[6];
-    const char D[6];
-    const char A[6];
-    const char not_D[6];
-    const char not_A[6];
-    const char neg_D[6];
-    const char neg_A[6];
-    const char D_p_1[6];
-    const char A_p_1[6];
-    const char D_m_1[6];
-    const char A_m_1[6];
-    const char D_p_A[6];
-    const char D_m_A[6];
-    const char A_m_D[6];
-    const char D_and_A[6];
-    const char D_or_A[6];
+    const char _0[7];
+    const char _1[7];
+    const char _neg_1[7];
+    const char D[7];
+    const char A[7];
+    const char not_D[7];
+    const char not_A[7];
+    const char neg_D[7];
+    const char neg_A[7];
+    const char D_p_1[7];
+    const char A_p_1[7];
+    const char D_m_1[7];
+    const char A_m_1[7];
+    const char D_p_A[7];
+    const char D_m_A[7];
+    const char A_m_D[7];
+    const char D_and_A[7];
+    const char D_or_A[7];
 };
 
 struct comp const comp_code = {
@@ -92,6 +92,40 @@ struct comp const comp_code = {
     .D_or_A = "010101",
 };
 
+char* get_comp_code(char code[7],char comp[4]){
+    // returns the comp code for the comp string 
+    // comp
+    if(strcmp(comp, "000")) strcpy(code,comp_code._0);
+    else if(strcmp(comp, "100")) strcpy(code,comp_code._1);
+    else if(strcmp(comp, "-10")) strcpy(code,comp_code._neg_1);
+    else if(strcmp(comp, "D00")) strcpy(code,comp_code.D);
+    else if(strcmp(comp, "A00")) strcpy(code,comp_code.A);
+    else if(strcmp(comp, "M00")) strcpy(code,comp_code.A);
+    else if(strcmp(comp, "!D0")) strcpy(code,comp_code.not_D);
+    else if(strcmp(comp, "!A0")) strcpy(code,comp_code.not_A);
+    else if(strcmp(comp, "!M0")) strcpy(code,comp_code.not_A);
+    else if(strcmp(comp, "-D0")) strcpy(code,comp_code.neg_D);
+    else if(strcmp(comp, "-A0")) strcpy(code,comp_code.neg_A);
+    else if(strcmp(comp, "-M0")) strcpy(code,comp_code.neg_A);
+    else if(strcmp(comp, "D+1")) strcpy(code,comp_code.D_p_1);
+    else if(strcmp(comp, "A+1")) strcpy(code,comp_code.A_p_1);
+    else if(strcmp(comp, "M+1")) strcpy(code,comp_code.A_p_1);
+    else if(strcmp(comp, "D-1")) strcpy(code,comp_code.D_m_1);
+    else if(strcmp(comp, "A-1")) strcpy(code,comp_code.A_m_1);
+    else if(strcmp(comp, "M-1")) strcpy(code,comp_code.A_m_1);
+    else if(strcmp(comp, "D+A")) strcpy(code,comp_code.D_p_A);
+    else if(strcmp(comp, "D+M")) strcpy(code,comp_code.D_p_A);
+    else if(strcmp(comp, "D-A")) strcpy(code,comp_code.D_m_A);
+    else if(strcmp(comp, "D-M")) strcpy(code,comp_code.D_m_A);
+    else if(strcmp(comp, "A-D")) strcpy(code,comp_code.A_m_D);
+    else if(strcmp(comp, "M-D")) strcpy(code,comp_code.A_m_D);
+    else if(strcmp(comp, "D&A")) strcpy(code,comp_code.D_and_A);
+    else if(strcmp(comp, "D&M")) strcpy(code,comp_code.D_and_A);
+    else if(strcmp(comp, "D|A")) strcpy(code,comp_code.D_or_A);
+    else if(strcmp(comp, "D|M")) strcpy(code,comp_code.D_or_A);
+    return code;
+}
+
 char* process_line(char code[bits],int n, char line[n+1]){
      
     for (int i = 0;i < bits;i++){
@@ -114,17 +148,17 @@ char* process_line(char code[bits],int n, char line[n+1]){
         }
     }
 
-    // if eq = 1 then the line is a computation
     // if eq = 0 then it's a jump statement
+    // if eq = 1 then the line is a computation
     // if eq = 2 then it's a @value type instruction
     char before[4] = "000";
     char after[4] = "000";
     int enc = 0;
     switch (eq) {
-        case 1:
+        case 0:
             for (int i = 0;i < n;i++){
-                if (enc == 0 && line[i] != '=') before[i] = line[i];
-                else if(line[i] == '=') enc = i;
+                if (enc == 0 && line[i] != ';') before[i] = line[i];
+                else if(line[i] == ';') enc = i;
                 else if(enc != 0){
                     if(line[i] != '\0'){
                         after[i-enc] = line[i];
@@ -132,10 +166,11 @@ char* process_line(char code[bits],int n, char line[n+1]){
                     else break; 
                 }
             }
-        case 0:
+            
+        case 1:
             for (int i = 0;i < n;i++){
-                if (enc == 0 && line[i] != ';') before[i] = line[i];
-                else if(line[i] == ';') enc = i;
+                if (enc == 0 && line[i] != '=') before[i] = line[i];
+                else if(line[i] == '=') enc = i;
                 else if(enc != 0){
                     if(line[i] != '\0'){
                         after[i-enc] = line[i];
@@ -157,6 +192,7 @@ char* process_line(char code[bits],int n, char line[n+1]){
     }
     return code;
 }
+
 
 
 int main(int argc, char* argv[argc+1]){
