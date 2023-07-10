@@ -17,7 +17,7 @@ struct jump{
     const char JMP[4];
 };
 
-struct jump const jmp = {
+struct jump const jmp_code = {
     .nothing = "000",
     .JGT = "001",
     .JEQ = "010",
@@ -27,6 +27,18 @@ struct jump const jmp = {
     .JLE = "110",
     .JMP = "111",
 };
+
+char* get_jmp_adr(char code[4],char jmp_adr[4]){
+    if(!strcmp(jmp_adr,"000")) strcpy(code,jmp_code.nothing);
+    else if(!strcmp(jmp_adr,"JGT")) strcpy(code,jmp_code.JGT);
+    else if(!strcmp(jmp_adr,"JEQ")) strcpy(code,jmp_code.JEQ);
+    else if(!strcmp(jmp_adr,"JGE")) strcpy(code,jmp_code.JGE);
+    else if(!strcmp(jmp_adr,"JLT")) strcpy(code,jmp_code.JLT);
+    else if(!strcmp(jmp_adr,"JNE")) strcpy(code,jmp_code.JNE);
+    else if(!strcmp(jmp_adr,"JLE")) strcpy(code,jmp_code.JLE);
+    else if(!strcmp(jmp_adr,"JMP")) strcpy(code,jmp_code.JMP);
+    return code;
+}
 
 struct dest{
     const char nothing[4];
@@ -49,6 +61,20 @@ struct dest const dest_adr= {
     .AD = "110",
     .AMD = "111",
 };
+
+char* get_dest_adr(char code[4],char dest[4]){
+    // returns destination adress for the expre
+    // -ssion dest
+    if (!strcmp(dest,"000")) strcpy(code, dest_adr.nothing);
+    else if (!strcmp(dest,"M00")) strcpy(code, dest_adr.M);
+    else if (!strcmp(dest,"D00")) strcpy(code, dest_adr.D);
+    else if (!strcmp(dest,"MD0")) strcpy(code, dest_adr.MD);
+    else if (!strcmp(dest,"A00")) strcpy(code, dest_adr.A);
+    else if (!strcmp(dest,"AM0")) strcpy(code, dest_adr.AM);
+    else if (!strcmp(dest,"AD0")) strcpy(code, dest_adr.AD);
+    else if (!strcmp(dest,"AMD")) strcpy(code, dest_adr.AMD);
+    return code;
+}
 
 struct comp{
     const char _0[7];
@@ -95,34 +121,34 @@ struct comp const comp_code = {
 char* get_comp_code(char code[7],char comp[4]){
     // returns the comp code for the comp string 
     // comp
-    if(strcmp(comp, "000")) strcpy(code,comp_code._0);
-    else if(strcmp(comp, "100")) strcpy(code,comp_code._1);
-    else if(strcmp(comp, "-10")) strcpy(code,comp_code._neg_1);
-    else if(strcmp(comp, "D00")) strcpy(code,comp_code.D);
-    else if(strcmp(comp, "A00")) strcpy(code,comp_code.A);
-    else if(strcmp(comp, "M00")) strcpy(code,comp_code.A);
-    else if(strcmp(comp, "!D0")) strcpy(code,comp_code.not_D);
-    else if(strcmp(comp, "!A0")) strcpy(code,comp_code.not_A);
-    else if(strcmp(comp, "!M0")) strcpy(code,comp_code.not_A);
-    else if(strcmp(comp, "-D0")) strcpy(code,comp_code.neg_D);
-    else if(strcmp(comp, "-A0")) strcpy(code,comp_code.neg_A);
-    else if(strcmp(comp, "-M0")) strcpy(code,comp_code.neg_A);
-    else if(strcmp(comp, "D+1")) strcpy(code,comp_code.D_p_1);
-    else if(strcmp(comp, "A+1")) strcpy(code,comp_code.A_p_1);
-    else if(strcmp(comp, "M+1")) strcpy(code,comp_code.A_p_1);
-    else if(strcmp(comp, "D-1")) strcpy(code,comp_code.D_m_1);
-    else if(strcmp(comp, "A-1")) strcpy(code,comp_code.A_m_1);
-    else if(strcmp(comp, "M-1")) strcpy(code,comp_code.A_m_1);
-    else if(strcmp(comp, "D+A")) strcpy(code,comp_code.D_p_A);
-    else if(strcmp(comp, "D+M")) strcpy(code,comp_code.D_p_A);
-    else if(strcmp(comp, "D-A")) strcpy(code,comp_code.D_m_A);
-    else if(strcmp(comp, "D-M")) strcpy(code,comp_code.D_m_A);
-    else if(strcmp(comp, "A-D")) strcpy(code,comp_code.A_m_D);
-    else if(strcmp(comp, "M-D")) strcpy(code,comp_code.A_m_D);
-    else if(strcmp(comp, "D&A")) strcpy(code,comp_code.D_and_A);
-    else if(strcmp(comp, "D&M")) strcpy(code,comp_code.D_and_A);
-    else if(strcmp(comp, "D|A")) strcpy(code,comp_code.D_or_A);
-    else if(strcmp(comp, "D|M")) strcpy(code,comp_code.D_or_A);
+    if(!strcmp(comp, "000")) strcpy(code,comp_code._0);
+    else if(!strcmp(comp, "100")) strcpy(code,comp_code._1);
+    else if(!strcmp(comp, "-10")) strcpy(code,comp_code._neg_1);
+    else if(!strcmp(comp, "D00")) strcpy(code,comp_code.D);
+    else if(!strcmp(comp, "A00")) strcpy(code,comp_code.A);
+    else if(!strcmp(comp, "M00")) strcpy(code,comp_code.A);
+    else if(!strcmp(comp, "!D0")) strcpy(code,comp_code.not_D);
+    else if(!strcmp(comp, "!A0")) strcpy(code,comp_code.not_A);
+    else if(!strcmp(comp, "!M0")) strcpy(code,comp_code.not_A);
+    else if(!strcmp(comp, "-D0")) strcpy(code,comp_code.neg_D);
+    else if(!strcmp(comp, "-A0")) strcpy(code,comp_code.neg_A);
+    else if(!strcmp(comp, "-M0")) strcpy(code,comp_code.neg_A);
+    else if(!strcmp(comp, "D+1")) strcpy(code,comp_code.D_p_1);
+    else if(!strcmp(comp, "A+1")) strcpy(code,comp_code.A_p_1);
+    else if(!strcmp(comp, "M+1")) strcpy(code,comp_code.A_p_1);
+    else if(!strcmp(comp, "D-1")) strcpy(code,comp_code.D_m_1);
+    else if(!strcmp(comp, "A-1")) strcpy(code,comp_code.A_m_1);
+    else if(!strcmp(comp, "M-1")) strcpy(code,comp_code.A_m_1);
+    else if(!strcmp(comp, "D+A")) strcpy(code,comp_code.D_p_A);
+    else if(!strcmp(comp, "D+M")) strcpy(code,comp_code.D_p_A);
+    else if(!strcmp(comp, "D-A")) strcpy(code,comp_code.D_m_A);
+    else if(!strcmp(comp, "D-M")) strcpy(code,comp_code.D_m_A);
+    else if(!strcmp(comp, "A-D")) strcpy(code,comp_code.A_m_D);
+    else if(!strcmp(comp, "M-D")) strcpy(code,comp_code.A_m_D);
+    else if(!strcmp(comp, "D&A")) strcpy(code,comp_code.D_and_A);
+    else if(!strcmp(comp, "D&M")) strcpy(code,comp_code.D_and_A);
+    else if(!strcmp(comp, "D|A")) strcpy(code,comp_code.D_or_A);
+    else if(!strcmp(comp, "D|M")) strcpy(code,comp_code.D_or_A);
     return code;
 }
 
