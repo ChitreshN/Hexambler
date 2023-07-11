@@ -191,6 +191,8 @@ char* process_line(char code[bits],int n, char line[n+1]){
     // if eq = 2 then it's a @value type instruction
     char before[4] = "000";
     char after[4] = "000";
+    char number[7] = "000000";
+    char rev[4] = "000";
     int a = 0;
     int enc = 0;
     switch (eq) {
@@ -216,6 +218,7 @@ char* process_line(char code[bits],int n, char line[n+1]){
             for (int i = 13;i<16;i++){
                 code[i] = j[i-13];
             }
+
         case 1:
             for (int i = 0;i < n;i++){
                 if (enc == 0 && line[i] != '=') before[i] = line[i];
@@ -238,19 +241,27 @@ char* process_line(char code[bits],int n, char line[n+1]){
             }
             a = is_memory_operation(after);
 
-
         case 2:
+            enc = -1;
             for (int i = 0;i < n;i++){
-                if (enc == 0 && line[i] != '@') before[i] = line[i];
-                else if(line[i] == '@') enc = i;
-                else if(enc != 0){
+                if (enc == -1 && line[i] != '@') before[i] = line[i];
+                else if(line[i] == '@'){
+                    enc = i;
+                }
+                else if(enc != -1){
                     if(line[i] != '\0'){
-                        after[i-enc-1] = line[i];
+                        number[(i-enc-1)] = line[i];
+                        printf("%s\n",number);
                     }
-                    else break; 
+                    else {
+                        number[i-enc-1] = '\0';   
+                        printf("%d\n",i);
+                        break;
+                    }
                 }
             }
 
+            int num = atoi(number);
     }
     if (a != 0) code[3] = '1';
     return code;
@@ -268,7 +279,7 @@ int main(int argc, char* argv[argc+1]){
     //    fclose(progfile);
     //}
     char code[bits];
-    char* c = process_line(code, 8, argv[1]);
+    char* c = process_line(code, buffer_max, argv[1]);
     printf("%s\n",c);
     printf("%s",argv[1]);
     return 0;
