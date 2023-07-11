@@ -152,10 +152,22 @@ char* get_comp_code(char code[7],char comp[4]){
     return code;
 }
 
+int is_memory_operation(char comp[4]){
+    int a = 0;
+    for (int i = 0;i < 3;i++){
+        if ('M' == comp[i]){
+            a = 1;
+            break;
+        }
+    }
+    return a;
+}
+
 char* process_line(char code[bits],int n, char line[n+1]){
      
     for (int i = 0;i < bits;i++){
-        code[i] = '0';
+        if (i < 3) code[i] = '1';
+        else code[i] = '0';
     }
     // check for = or ; in line
     int eq = -1;
@@ -173,12 +185,13 @@ char* process_line(char code[bits],int n, char line[n+1]){
             break;
         }
     }
-
+    // dest = comp;jmp
     // if eq = 0 then it's a jump statement
     // if eq = 1 then the line is a computation
     // if eq = 2 then it's a @value type instruction
     char before[4] = "000";
     char after[4] = "000";
+    int a = 0;
     int enc = 0;
     switch (eq) {
         case 0:
@@ -187,35 +200,59 @@ char* process_line(char code[bits],int n, char line[n+1]){
                 else if(line[i] == ';') enc = i;
                 else if(enc != 0){
                     if(line[i] != '\0'){
-                        after[i-enc] = line[i];
+                        after[i-enc-1] = line[i];
                     }
                     else break; 
                 }
             }
-            
+            a = is_memory_operation(before);
+            char comp[7];
+            char* c = get_comp_code(comp,before);
+            char jmp[4];
+            char *j = get_jmp_adr(jmp,after);
+            for (int i = 4;i < 10;i++){
+                code[i] = c[i-4];
+            }
+            for (int i = 13;i<16;i++){
+                code[i] = j[i-13];
+            }
         case 1:
             for (int i = 0;i < n;i++){
                 if (enc == 0 && line[i] != '=') before[i] = line[i];
                 else if(line[i] == '=') enc = i;
                 else if(enc != 0){
                     if(line[i] != '\0'){
-                        after[i-enc] = line[i];
+                        after[i-enc-1] = line[i];
                     }
                     else break; 
                 }
             }
+            c = get_comp_code(comp,after);
+            char dest[4];
+            char *d = get_dest_adr(dest,before);
+            for (int i = 4;i < 10;i++){
+                code[i] = c[i-4];
+            }
+             for (int i = 10;i<13;i++){
+                code[i] = d[i-10];
+            }
+            a = is_memory_operation(after);
+
+
         case 2:
             for (int i = 0;i < n;i++){
                 if (enc == 0 && line[i] != '@') before[i] = line[i];
                 else if(line[i] == '@') enc = i;
                 else if(enc != 0){
                     if(line[i] != '\0'){
-                        after[i-enc] = line[i];
+                        after[i-enc-1] = line[i];
                     }
                     else break; 
                 }
             }
+
     }
+    if (a != 0) code[3] = '1';
     return code;
 }
 
@@ -223,7 +260,7 @@ char* process_line(char code[bits],int n, char line[n+1]){
 
 int main(int argc, char* argv[argc+1]){
    // FILE* progfile = fopen("max/MaxL.asm","r");
-    char buffer[buffer_max] = {0};
+    //char buffer[buffer_max] = {0};
     //if (progfile){
     //    while(fgets(buffer, buffer_max, progfile)){
     //        if(buffer[0] != '/' && !isspace(buffer[0]))  fputs(buffer, stdout);
@@ -231,8 +268,8 @@ int main(int argc, char* argv[argc+1]){
     //    fclose(progfile);
     //}
     char code[bits];
-    char* processed = process_line(code, 5, "1=12");
-    printf("%s",processed);
+    char* c = process_line(code, 8, argv[1]);
+    printf("%s\n",c);
+    printf("%s",argv[1]);
     return 0;
 }
- 
